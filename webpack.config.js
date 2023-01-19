@@ -28,6 +28,10 @@ module.exports = async (env, options) => {
     },
     resolve: {
       extensions: [".ts", ".tsx", ".html", ".js"],
+		fallback: {
+			stream: require.resolve('stream-browserify'),
+			crypto: require.resolve('crypto-browserify')
+		}
     },
     module: {
       rules: [

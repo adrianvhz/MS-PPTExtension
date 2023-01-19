@@ -1,22 +1,37 @@
 import * as React from "react";
+import { Spinner, SpinnerSize } from "@fluentui/react/lib/Spinner";
+// import generateToken from "../../lib/generateToken";
 
 export default function ReplaceVars({ filename }) {
-	console.log("filename", filename)
+	const [isLoading, setIsLoading] = React.useState(false);
+
 	React.useEffect(() => {
-		fetch(`https://idcloudsystem.com/api/products/${filename}/detail`, {
+		const alias = filename.split("-")[0];
+
+		setIsLoading(true);
+		fetch(`https://idcloudsystem.com/api/products/${alias}/detail`, {
 			method: "POST",
 			headers: {
-				"Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NzQwNTk3MTYsImV4cCI6MTY3NDE0NjExNiwia2V5IjoidXNlcnBpZWNlIn0.AX6MoJVyeG54noHdy3GglwsXf-aY7J8TijxfPosIeWM"
+				// "Authorization": "Bearer " + window.localStorage.getItem("tk") || generateToken()
+				"Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NzQwNTk3MTYsImV4cCI6MTczNzMwNDc0Njc2NCwia2V5IjoiaFZtWXEzdDYifQ.qRVUF9wcJp7YNiOk-Saknf6e9trRuhD3uScm6y2VLkk"
 			},
 		})
 			.then(raw => raw.json()).then(res => {
-				console.log(res);
 				replaceAllVars(res.data);
+				setIsLoading(false);
 			})
 	}, []);
 
+	if (isLoading) {
+		return (
+			<div>
+				<Spinner size={SpinnerSize.medium} />
+			</div>
+		)
+	}
+
 	return (
-		<div>Reemplazando...</div>
+		<p>Done</p>
 	)
 }
 
@@ -30,26 +45,30 @@ async function replaceAllVars(data: any) {
 
 		console.log("slides count:", countSlides);
 
+		const itemText = (str: string) => {
+			const div = document.createElement('div');
+			div.innerHTML = str;
+			return div.innerText
+		}
+
 		for (let i = 0; i < countSlides; i++) {
 			const slide = context.presentation.slides.getItemAt(i);
 			slide.shapes.load({ textFrame: { $all: true, textRange: { $all: true } } });
 			await context.sync();
 
-			slide.shapes.load({ textFrame: { textRange: { text: true } }, name: true });
+			slide.shapes.load({ textFrame: { textRange: { text: true } } });
 			await context.sync();
 			for (let v = 0; v < slide.shapes.items.length; v++) {
 				// slide.shapes.items[v].load({ $all: true });
 				// await context.sync();
 				const var_data = slide.shapes.items[v].textFrame.textRange;
-				console.log(var_data.text);
-				console.log(slide.shapes.items[v].name);
-				console.log(var_data.text === "{{PRESENTATION_PRODUCTO}}");
+				// console.log(var_data.text);
+				// console.log(slide.shapes.items[v].name);
+
 				if (var_data.text.startsWith("{{")) {
-					// var_data.text = data.product.presentation;
-					var_data.text = data.product[var_data.text.slice(2).split("_")[0].toLowerCase()];
+					var x = data.product[data.variables.find((el: any) => el.name === var_data.text).column];
+					var_data.text = itemText(x);
 					context.sync();
-				} else {
-					continue;
 				}
 			}
 		}

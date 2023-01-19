@@ -46,7 +46,7 @@ export default function App(props: any) {
 		getIsMasterTemplate(handleFilename).then((res) => {
 			setIsMasterTemplate(res);
 		});
-		console.log("Permisos de archivo:", Office.context.document.mode);	
+		// console.log("Permisos de archivo:", Office.context.document.mode);	
 	}, []);
 
 	if (!isOfficeInitialized) {
@@ -71,8 +71,8 @@ export default function App(props: any) {
 				Producto: {"{prod_name}"}
 			</h3> */}
 			{isMasterTemplate
-				? <RequestedButtons />
-				: <ReplaceVars filename={filename} />
+				? <RequestedButtons /> // master
+				: <ReplaceVars filename={filename} /> // producto
 			}
 			
 			{/* <List message="demo">
@@ -101,7 +101,7 @@ export default function App(props: any) {
 					Add Shape
 				</DefaultButton>
 			</List> */}
-			<NotificationBar notification={notification} />
+			{/* <NotificationBar notification={notification} /> */}
 			{/* <Footer logo="a" message="a" title="s" /> */}
 		</div>
 	)
