@@ -3,47 +3,62 @@ import * as React from "react";
 
 export default function RequestedButtons() {
 	const [loading, setLoading] = React.useState(true);
-	const [data, setData] = React.useState<string[]>();
+	const [data, setData] = React.useState<any[]>();
 
 	React.useEffect(() => {
-		fetch("https://wserv-qa.proeducative.com/program/getProducDetailById", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-				"Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NzM0NzUwNDgsImV4cCI6NjMyMTcwMDcyMDg2LCJrZXkiOiJBSDNpSDE2UFhTMiJ9.F9OWhE0FcV96AqI0SYIkZz3JLR81ReRjJG7Z1zdG2w4"
-			},
-			body: new URLSearchParams([["id", "8240"]])
-		})
-			.then(raw => raw.json()).then(res => {
-				setData(Object.keys(res.data.docentes[0])); //docentes[0] // features[0] // product
-				setLoading(false);
-			})
+		const xhr = new XMLHttpRequest();
+		xhr.open("POST", "https://idcloudsystem.com/api/products/variables");
+		xhr.setRequestHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NzQwNTk3MTYsImV4cCI6MTY3NDE0NjExNiwia2V5IjoidXNlcnBpZWNlIn0.AX6MoJVyeG54noHdy3GglwsXf-aY7J8TijxfPosIeWM");
+		xhr.onload = () => {
+			const res = JSON.parse(xhr.response);
+			setData(res.data.variables);
+			setLoading(false);
+		}
+		xhr.send();
+
+		// fetch("https://idcloudsystem.com/api/products/30/detail", {
+		// 	method: "POST",
+		// 	headers: {
+		// 		"Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NzQwNTk3MTYsImV4cCI6MTY3NDE0NjExNiwia2V5IjoidXNlcnBpZWNlIn0.AX6MoJVyeG54noHdy3GglwsXf-aY7J8TijxfPosIeWM"
+		// 	},
+		// })
+		// 	.then(raw => raw.json()).then(res => {
+		// 		console.log(res)
+		// 		// setData(Object.keys(res.data.docentes[0])); //docentes[0] // features[0] // product
+		// 		// setLoading(false);
+		// 	})
 	}, []);
 
 	if (loading) return <span>Cargando...</span>
 
+	console.log(data)
 
-	// params
-	// master = master=""
-	// client =
- 
 	return (
-		<div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5px" }}>
+		<div
+			style={{
+				display: "grid",
+				// gridTemplateColumns: "1fr 1fr",
+				gridTemplateColumns: "1fr",
+				gap: "5px"
+			}}>
 			{data.map(el => (
 				<CompoundButton
 					primary
-					secondaryText={"[image]"}
-					text={`{{${el}}}`}
-					onClick={() => insertVariable(el)}
+					secondaryText={el.type}
+					text={el.name}
+					onClick={() => insertVariable(el.name)}
 				/>
 			))}
 		</div>
 	)
 }
-// interface variable {[{
-// 	name: string,
-// 	type: string
-// }]
+
 async function insertVariable (variable: string) {
-	Office.context.document.setSelectedDataAsync(`{{${variable}}}`);
+	Office.context.document.setSelectedDataAsync(variable , {
+		coercionType: Office.CoercionType.Text
+	});
+
+	// Office.context.document.getFilePropertiesAsync(null, (x) => {
+	// 	console.log(x.value);
+	// });
 }

@@ -6,6 +6,7 @@ import List, { ListItem } from "./List";
 import Progress from "./Progress";
 import NotificationBar from "./NotificationBar";
 import RequestedButtons from "./RequestedButtons";
+import ReplaceVars from "./ReplaceVars";
 
 /* global console, Office, require */
 
@@ -22,14 +23,31 @@ export interface AppState {
 	}
 }
 
-export default function App(props) {
+export default function App(props: any) {
+	const [isMasterTemplate, setIsMasterTemplate] = React.useState(null);
+	const [filename, setFilename] = React.useState("");
 	const [notification, setNotification] = React.useState({
 		message: "none",
 		error: false
 	});
 
 	const { title, isOfficeInitialized } = props;
-	const isMasterTemplate = getIsMasterTemplate();
+	
+	console.log("is master template:", isMasterTemplate);
+
+	const handleFilename = (name: string) => {
+		setFilename(name);
+	}
+
+	React.useEffect(() => {
+		// console.log(Office.context.document.getFilePropertiesAsync(null, (x) => {
+		// 	console.log(x.value);
+		// }));
+		getIsMasterTemplate(handleFilename).then((res) => {
+			setIsMasterTemplate(res);
+		});
+		console.log("Permisos de archivo:", Office.context.document.mode);	
+	}, []);
 
 	if (!isOfficeInitialized) {
 		return (
@@ -41,24 +59,23 @@ export default function App(props) {
 		)
 	}
 
-	console.log(112313123123, Boolean(isMasterTemplate), isMasterTemplate);
-
-	if (isMasterTemplate) {
-		return <div>
-			Holaaaaaaaa
-		</div>
+	if (isMasterTemplate === null) {
+		return <div>NONE</div>
 	}
 
 	return (
 		<div className="ms-welcome" style={{ padding: "1rem 1.5rem" }}>
 			{/* <Header logo={require("./../../../assets/logo-filled.png")} title={title} message="DEMO" /> */}
 
-			<h3 style={{ marginTop: 0, marginBottom: "1rem" }}>
+			{/* <h3 style={{ marginTop: 0, marginBottom: "1rem" }}>
 				Producto: {"{prod_name}"}
-			</h3>
-			<RequestedButtons />
-
-			<List message="demo">
+			</h3> */}
+			{isMasterTemplate
+				? <RequestedButtons />
+				: <ReplaceVars filename={filename} />
+			}
+			
+			{/* <List message="demo">
 				<Button
 					className="ms-welcome__action"
 					iconProps={{ iconName: "ChangeEntitlements" }}
@@ -83,9 +100,9 @@ export default function App(props) {
 				>
 					Add Shape
 				</DefaultButton>
-			</List>
+			</List> */}
 			<NotificationBar notification={notification} />
-			<Footer logo="a" message="a" title="s" />
+			{/* <Footer logo="a" message="a" title="s" /> */}
 		</div>
 	)
 }
@@ -480,8 +497,24 @@ const newDefaultSlide = async () => {
 
 
 
-function getIsMasterTemplate() {
-	const params = new URLSearchParams(location.search);
-	console.log(window.location.toString());
-	return params.get("master");
+async function getIsMasterTemplate(handleFilename) {
+	let filename = await getFileName(handleFilename); 
+
+	if (filename.startsWith("MA")) return true;
+	else if (filename.startsWith("PA")) return false;
+	else return null;
+}
+
+const getFileName: (handleFilename) => Promise<string> = async (handleFilename) => {
+	return new Promise((resolve) => {
+		Office.context.document.getFilePropertiesAsync(null, (res) => {
+			if (res && res.value && res.value.url) {
+				let name = res.value.url.slice(res.value.url.lastIndexOf("/") + 1);
+				handleFilename(name);
+				resolve(name);
+			} else {
+				resolve("");
+			}
+		});
+	});
 }
