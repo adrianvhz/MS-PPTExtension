@@ -38,7 +38,6 @@ export default function App(props: any) {
 	const handleFilename = (name: string) => {
 		setFilename(name);
 	}
-
 	React.useEffect(() => {
 		// console.log(Office.context.document.getFilePropertiesAsync(null, (x) => {
 		// 	console.log(x.value);
