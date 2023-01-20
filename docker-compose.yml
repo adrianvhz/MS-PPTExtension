@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+   nginx:
+      build:
+         context: .
+         dockerfile: Dockerfile
+      ports:
+         - 443:443
+      volumes:
+         - ${SSL_src}:/etc/nginx/certs

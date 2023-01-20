@@ -12,7 +12,7 @@ export default function ReplaceVars({ filename }) {
 		fetch(`https://idcloudsystem.com/api/products/${alias}/detail`, {
 			method: "POST",
 			headers: {
-				"Authorization": "Bearer " + window.localStorage.getItem("tk") || generateToken()
+				"Authorization": "Bearer " + generateToken()
 			},
 		})
 		.then(raw => raw.json()).then(res => {

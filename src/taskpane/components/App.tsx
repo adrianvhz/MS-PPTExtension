@@ -34,6 +34,7 @@ export default function App(props: any) {
 	const { title, isOfficeInitialized } = props;
 	
 	console.log("is master template:", isMasterTemplate);
+	console.log("->", process.env.SECRET_KEY);
 
 	const handleFilename = (name: string) => {
 		setFilename(name);
