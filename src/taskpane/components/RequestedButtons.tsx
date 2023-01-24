@@ -9,7 +9,7 @@ export default function RequestedButtons() {
 	React.useEffect(() => {
 		const xhr = new XMLHttpRequest();
 		xhr.open("POST", "https://idcloudsystem.com/api/products/variables");
-		xhr.setRequestHeader("Authorization", "Bearer " + window.localStorage.getItem("tk") || generateToken());
+		xhr.setRequestHeader("Authorization", "Bearer " + generateToken());
 		xhr.onload = () => {
 			const res = JSON.parse(xhr.response);
 			setData(res.data.variables);
