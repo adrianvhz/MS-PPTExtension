@@ -1,0 +1,12 @@
+server {
+	listen 9000;
+	
+	location / {
+		root   /usr/share/nginx/html;
+		index  taskpane.html;
+		try_files $uri /taskpane.html;                 
+	}
+	location = /50x.html {
+		root   /usr/share/nginx/html;
+	}
+}

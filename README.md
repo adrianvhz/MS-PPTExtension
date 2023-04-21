@@ -4,14 +4,9 @@ npm run start:desktop // not working correctly (current code optimized for web).
 npm run start:web        // Edit package.json  "scripts"->"start:web"   :     link = (your online office ppt project shared url). Create a office ppt [here]("https://www.office.com/launch/powerpoint?ui=es-ES&rs=CL&auth=1"). Then copy the shared link.
 
 
-npm run stop:desktop
 
-npm run stop:web
+![imagen 1](./images/image1.jpg)
 
-//
 
-Or
 
-//
-
-npm run stop
+![imagen 2](./images/image2.jpg)
